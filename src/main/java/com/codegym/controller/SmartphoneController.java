@@ -6,12 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
 
 import java.util.Optional;
 
 @RestController
-@CrossOrigin
+@CrossOrigin("*")
 @RequestMapping("/smartphones")
 public class SmartphoneController {
     @Autowired
@@ -47,9 +46,14 @@ public class SmartphoneController {
         return new ResponseEntity<>(smartphone.get(), HttpStatus.OK);
     }
 
-    @PutMapping
-    public ResponseEntity<Smartphone> editPhone(@RequestBody Smartphone smartphone){
-        return new ResponseEntity<>(smartphoneService.save(smartphone), HttpStatus.OK);
+    @PutMapping("/{id}")
+    public ResponseEntity<Smartphone> editPhone(@PathVariable Long id, @RequestBody Smartphone newSmartphone){
+        Optional<Smartphone> smartphone = smartphoneService.findById(id);
+        if (!smartphone.isPresent()){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        newSmartphone.setId(id);
+        return new ResponseEntity<>(smartphoneService.save(newSmartphone), HttpStatus.OK);
     }
 
 }
